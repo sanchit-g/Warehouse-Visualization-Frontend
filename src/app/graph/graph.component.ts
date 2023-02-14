@@ -1,3 +1,5 @@
+import { MqttService } from './../services/mqtt.service';
+import { MqttClientService } from './../mqtt-client.service';
 import { NodeData } from './../nodes/node';
 import { EdgeData } from './../edges/edge';
 import { Edge } from '../edges/edge';
@@ -7,24 +9,53 @@ import * as cytoscape from 'cytoscape';
 import { Node } from '../nodes/node';
 import { timeInterval } from 'rxjs';
 
+
 @Component({
     selector: 'app-graph',
     templateUrl: './graph.component.html',
     styleUrls: ['./graph.component.css'],
 })
 export class GraphComponent implements OnInit {
-    constructor(private graphService: GraphService) { }
+    constructor(private graphService: GraphService, private mqttClientService: MqttService) { }
 
+    queueName: string = 'test_queue';
     nodesData!: any[];
     edgesData!: any[];
     dataCombined: any;
     temp: { nodes: any[], edges: any[] } = { nodes: [], edges: [] };
 
+    customStyle: any[] = [
+        {
+            selector: 'node',
+            style: {
+                content: 'data(id)',
+                'background-color': 'red',
+                'text-valign': 'center',
+                'text-halign': 'center',
+                shape: 'barrel',
+            },
+        },
+        {
+            selector: 'edge',
+            css: {
+                'curve-style': 'bezier',
+                width: '8x',
+            },
+        },
+        {
+            selector: '.highlight',
+            css: {
+                'background-color': 'red',
+            },
+        }
+    ];
+
 
     ngOnInit(): void {
-        setInterval(() => {
-            this.getNode();
-        }, 10000);
+        // setInterval(() => {
+        this.getNode();
+        this.getStatus();
+        // }, 5000);
     }
 
 
@@ -38,9 +69,28 @@ export class GraphComponent implements OnInit {
     getEdges() {
         this.graphService.getEdges().subscribe(edge => {
             this.temp.edges = edge.edgeDataList;
-            console.log(this.temp.nodes);
+            // console.log(this.temp.edges);
             this.renderData();
         })
+    }
+
+    getStatus() {
+        this.mqttClientService.getMessages(this.queueName).subscribe(res => {
+            console.log(res);
+            var customStyleObject = {
+                selector: `#${res.stationId}`,
+                style: {
+                    content: res.containerId,
+                    'background-color': `${res.color}`,
+                    'text-valign': 'center',
+                    'text-halign': 'center',
+                    shape: 'barrel',
+                },
+            }
+            this.customStyle.push(customStyleObject);
+            this.renderData();
+            // this.customStyle.pop();
+        });
     }
 
     renderData() {
@@ -49,41 +99,7 @@ export class GraphComponent implements OnInit {
 
             boxSelectionEnabled: false,
 
-            style: [
-                {
-                    selector: 'node',
-                    style: {
-                        content: 'data(id)',
-                        'background-color': 'red',
-                        'text-valign': 'center',
-                        'text-halign': 'center',
-                        shape: 'barrel',
-                    },
-                },
-                {
-                    selector: '#h',
-                    style: {
-                        content: 'data(id)',
-                        'background-color': 'blue',
-                        'text-valign': 'center',
-                        'text-halign': 'center',
-                        shape: 'barrel',
-                    }
-                },
-                {
-                    selector: 'edge',
-                    css: {
-                        'curve-style': 'bezier',
-                        width: '8x',
-                    },
-                },
-                {
-                    selector: '.highlight',
-                    css: {
-                        'background-color': 'red',
-                    },
-                },
-            ],
+            style: this.customStyle,
 
             elements: {
                 nodes: this.temp.nodes,

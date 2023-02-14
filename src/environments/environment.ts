@@ -8,8 +8,9 @@ export const environment = {
         apiUrl: 'amqp://guest:guest@localhost:15672/vhosts',
     },
     mqtt: {
-        server: 'ws://localhost:15672',
+        server: 'localhost',
         protocol: 'ws',
-        port: 5672,
+        port: 15675,
+        useSSL: 'false'
     },
 };

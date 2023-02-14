@@ -10,6 +10,8 @@ import { GraphComponent } from './graph/graph.component';
 // import { MqttModule, IMqttServiceOptions } from 'ngx-mqtt';
 import { environment as env } from '../environments/environment';
 import { HttpClientModule } from '@angular/common/http';
+import { MqttClientService } from './mqtt-client.service';
+import { MqttService } from './services/mqtt.service';
 
 // const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
 //   hostname: env.mqtt.server,
@@ -29,7 +31,10 @@ import { HttpClientModule } from '@angular/common/http';
     HttpClientModule
     // MqttModule.forRoot(MQTT_SERVICE_OPTIONS),
   ],
-  providers: [],
+  providers: [
+    MqttClientService,
+    MqttService
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {
