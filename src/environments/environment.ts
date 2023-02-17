@@ -4,9 +4,6 @@ export const environment = {
     baseUrl: 'http://localhost:8080',
     getNodeData: '/get-node-data',
     getEdgeData: '/get-edge-data',
-    http: {
-        apiUrl: 'amqp://guest:guest@localhost:15672/vhosts',
-    },
     mqtt: {
         server: 'localhost',
         protocol: 'ws',

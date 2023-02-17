@@ -1,14 +1,12 @@
-import { MqttService } from './../services/mqtt.service';
-import { MqttClientService } from './../mqtt-client.service';
-import { NodeData } from './../nodes/node';
-import { EdgeData } from './../edges/edge';
-import { Edge } from '../edges/edge';
-import { GraphService } from './graph_services/graph.service';
+import { MqttService } from '../../Services/mqtt.service';
+import { NodeData } from '../../Models/nodes/node';
+import { EdgeData } from '../../Models/edges/edge';
+import { Edge } from '../../Models/edges/edge';
+import { GraphService } from '../../Services/graph_services/graph.service';
 import { Component, OnInit } from '@angular/core';
 import * as cytoscape from 'cytoscape';
-import { Node } from '../nodes/node';
+import { Node } from '../../Models/nodes/node';
 import { timeInterval } from 'rxjs';
-
 
 @Component({
     selector: 'app-graph',
@@ -16,30 +14,38 @@ import { timeInterval } from 'rxjs';
     styleUrls: ['./graph.component.css'],
 })
 export class GraphComponent implements OnInit {
-    constructor(private graphService: GraphService, private mqttClientService: MqttService) { }
+    constructor(
+        private graphService: GraphService,
+        private mqttClientService: MqttService
+    ) { }
 
     queueName: string = 'test_queue';
     nodesData!: any[];
     edgesData!: any[];
     dataCombined: any;
-    temp: { nodes: any[], edges: any[] } = { nodes: [], edges: [] };
+    temp: { nodes: any[]; edges: any[] } = { nodes: [], edges: [] };
 
     customStyle: any[] = [
         {
             selector: 'node',
             style: {
-                content: 'data(id)',
-                'background-color': 'red',
+                'background-color': 'blue',
                 'text-valign': 'center',
                 'text-halign': 'center',
-                shape: 'barrel',
+                height: '1px',
+                width: '1px',
+                'font-size': '0.6px',
+                'overlay-opacity': 0,
             },
         },
         {
             selector: 'edge',
             css: {
                 'curve-style': 'bezier',
-                width: '8x',
+                width: '0.1px',
+                'target-arrow-shape': 'triangle',
+                'arrow-scale': '0.03px',
+                'overlay-opacity': 0,
             },
         },
         {
@@ -47,35 +53,46 @@ export class GraphComponent implements OnInit {
             css: {
                 'background-color': 'red',
             },
-        }
+        },
     ];
-
 
     ngOnInit(): void {
         // setInterval(() => {
         this.getNode();
         this.getStatus();
-        // }, 5000);
+        // }, 1000);
     }
 
-
     getNode() {
-        this.graphService.getNodes().subscribe(res => {
+        this.graphService.getNodes().subscribe((res) => {
             this.temp.nodes = res.nodeDataList;
+
+            this.temp.nodes.forEach((node) => {
+                var customStyleObject = {
+                    selector: `#${node.data.id}`,
+                    style: {
+                        content: node.data.id,
+                        shape: `${node.data.type}`,
+                        'background-color': `${node.data.color}`,
+                        height: `${node.data.height}`,
+                        width: `${node.data.width}`,
+                    },
+                };
+                this.customStyle.push(customStyleObject);
+            });
             this.getEdges();
-        })
+        });
     }
 
     getEdges() {
-        this.graphService.getEdges().subscribe(edge => {
+        this.graphService.getEdges().subscribe((edge) => {
             this.temp.edges = edge.edgeDataList;
-            // console.log(this.temp.edges);
             this.renderData();
-        })
+        });
     }
 
     getStatus() {
-        this.mqttClientService.getMessages(this.queueName).subscribe(res => {
+        this.mqttClientService.getMessages(this.queueName).subscribe((res) => {
             console.log(res);
             var customStyleObject = {
                 selector: `#${res.stationId}`,
@@ -86,7 +103,7 @@ export class GraphComponent implements OnInit {
                     'text-halign': 'center',
                     shape: 'barrel',
                 },
-            }
+            };
             this.customStyle.push(customStyleObject);
             this.renderData();
             // this.customStyle.pop();
@@ -107,8 +124,8 @@ export class GraphComponent implements OnInit {
             },
 
             layout: {
-                name: 'grid',
-                rows: 2
+                name: 'preset',
+                padding: 5,
             },
         });
 
@@ -128,31 +145,10 @@ export class GraphComponent implements OnInit {
     }
 }
 
-
-
-
-
-
 // nodes: [
-//     { data: { id: 'a' } },
-//     { data: { id: 'b' } },
-//     { data: { id: 'c' } },
-//     { data: { id: 'd' } },
-//     { data: { id: 'e' } },
-//     { data: { id: 'f' } },
-//     { data: { id: 'g' } },
-//     { data: { id: 'h' } },
-//     { data: { id: 'i' } },
+//     { data: { id: 'a'} },
 
 // ],
 // edges: [
 //     { data: { id: 'ab', source: 'a', target: 'b' } },
-//     { data: { id: 'bc', source: 'b', target: 'c' } },
-//     { data: { id: 'cd', source: 'c', target: 'd' } },
-//     { data: { id: 'de', source: 'd', target: 'e' } },
-//     { data: { id: 'bf', source: 'b', target: 'f' } },
-//     { data: { id: 'bg', source: 'b', target: 'g' } },
-//     { data: { id: 'ch', source: 'c', target: 'h' } },
-//     { data: { id: 'ci', source: 'c', target: 'i' } },
-//     { data: { id: 'hb', source: 'h', target: 'b' } },
 // ],

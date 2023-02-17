@@ -1,9 +1,9 @@
-import { Edge, EdgeList } from './../../edges/edge';
-import { environment } from './../../../environments/environment';
+import { Edge, EdgeList } from '../../Models/edges/edge';
+import { environment } from '../../../environments/environment';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpHandler, HttpHeaders } from '@angular/common/http';
-import { Node, NodeListResponse } from 'src/app/nodes/node';
+import { Node, NodeListResponse } from 'src/app/Models/nodes/node';
 
 @Injectable({
     providedIn: 'root'

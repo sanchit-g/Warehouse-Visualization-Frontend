@@ -4,7 +4,14 @@ export interface NodeListResponse {
 export interface NodeData {
     nodeIndex: number;
     data: Node;
+    position: Position;
 }
 export interface Node {
     id: string;
+}
+
+export interface Position {
+    id: number;
+    x: number;
+    y: number;
 }
