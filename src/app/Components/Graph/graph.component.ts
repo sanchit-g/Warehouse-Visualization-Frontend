@@ -1,3 +1,4 @@
+import { ContainerService } from './../../Services/container.service';
 import { tempPosition } from './../../Models/nodes/node';
 import { MqttService } from '../../Services/mqtt.service';
 import { GraphService } from '../../Services/graph_services/graph.service';
@@ -14,7 +15,8 @@ import { NgFor } from '@angular/common';
 export class GraphComponent implements OnInit {
     constructor(
         private graphService: GraphService,
-        private mqttClientService: MqttService
+        private mqttClientService: MqttService,
+        private containerService: ContainerService
     ) { }
 
     queueName: string = 'test_queue';
@@ -70,25 +72,6 @@ export class GraphComponent implements OnInit {
         this.getNode();
         this.getStatus();
         // }, 1000);
-    }
-
-    createContainer() {
-        var stage = new createjs.Stage('containerCircle');
-        var circle = new createjs.Shape();
-        circle.graphics.beginFill("DeepSkyBlue").drawCircle(0, 0, 10);
-
-        circle.x = this.nodePos.at(0).x;
-        circle.y = this.nodePos.at(0).y;
-
-        stage.addChild(circle);
-        stage.update();
-
-        createjs.Tween.get(circle, { loop: true })
-            .to({ visible: false, x: this.nodePos.at(1).x }, 2000)
-
-        createjs.Ticker.setFPS(60);
-        createjs.Ticker.addEventListener("tick", stage);
-
     }
 
     getNode() {
@@ -166,6 +149,7 @@ export class GraphComponent implements OnInit {
             this.tempNodePos = cy.$(`#${node.data.id}`).renderedPosition();
             this.nodePos.push(this.tempNodePos);
         })
-        this.createContainer();
+
+        this.containerService.createContainer(this.nodePos);
     }
 }
