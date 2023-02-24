@@ -22,8 +22,10 @@ export class GraphComponent implements OnInit {
 
     queueName: string = 'test_queue';
     temp: { nodes: any[]; edges: any[] } = { nodes: [], edges: [] };
-    nodePos: ContainerPosition[] = [];
+    nodePos: ContainerPosition[] | any[] = [];
     cy: any;
+    indexFromScanner!: number;
+    indexToScanner!: number;
 
     getWidth(): any {
         return screen.width;
@@ -65,10 +67,9 @@ export class GraphComponent implements OnInit {
     ];
 
     ngOnInit(): void {
-        // setInterval(() => {
+        this.containerService.createStage();
         this.getNode();
         this.getStatus();
-        // }, 1000);
     }
 
     getNode() {
@@ -101,8 +102,8 @@ export class GraphComponent implements OnInit {
 
     getStatus() {
         this.mqttClientService.getMessages(this.queueName).subscribe((res) => {
+            console.log(res);
             this.containerService.createContainer(this.nodePos, res.fromScanner, res.toScanner);
-            this.renderData();
         });
     }
 
