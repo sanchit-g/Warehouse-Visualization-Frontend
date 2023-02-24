@@ -1,11 +1,12 @@
-import { ContainerService } from './../../Services/container.service';
-import { tempPosition } from './../../Models/nodes/node';
+import { ContainerPosition } from './../../Models/container/containers';
+import { ContainerService } from '../../Services/ContainerService/container.service';
 import { MqttService } from '../../Services/mqtt.service';
 import { GraphService } from '../../Services/graph_services/graph.service';
 import { AfterViewInit, Component, OnInit } from '@angular/core';
 import * as cytoscape from 'cytoscape';
 import * as createjs from 'createjs-module';
 import { NgFor } from '@angular/common';
+import { map } from 'rxjs/operators'
 
 @Component({
     selector: 'app-graph',
@@ -20,13 +21,9 @@ export class GraphComponent implements OnInit {
     ) { }
 
     queueName: string = 'test_queue';
-    nodesData!: any[];
-    edgesData!: any[];
-    dataCombined: any;
     temp: { nodes: any[]; edges: any[] } = { nodes: [], edges: [] };
-    nodePos: any[] = [];
-    tempNodePos!: any;
-    index!: number;
+    nodePos: ContainerPosition[] = [];
+    cy: any;
 
     getWidth(): any {
         return screen.width;
@@ -77,7 +74,6 @@ export class GraphComponent implements OnInit {
     getNode() {
         this.graphService.getNodes().subscribe((res) => {
             this.temp.nodes = res.nodeDataList;
-            console.log(this.temp.nodes);
 
             this.temp.nodes.forEach((node) => {
                 var customStyleObject = {
@@ -105,25 +101,27 @@ export class GraphComponent implements OnInit {
 
     getStatus() {
         this.mqttClientService.getMessages(this.queueName).subscribe((res) => {
-            console.log(res);
-            var customStyleObject = {
-                selector: `#${res.fromScanner}, #${res.toScanner}`,
-                style: {
-                    content: res.containerId,
-                    'background-color': `${res.color}`,
-                    'text-valign': 'center',
-                    'text-halign': 'center',
-                    "font-size": '0.4px',
-                    shape: 'barrel',
-                },
-            };
-            this.customStyle.push(customStyleObject);
+            this.containerService.createContainer(this.nodePos, res.fromScanner, res.toScanner);
             this.renderData();
         });
     }
 
+    getContainer() {
+        this.temp.nodes.forEach((node) => {
+            var tempVariable = this.cy.$(`#${node.data.id}`).renderedPosition();
+
+            var tempNodePos = {
+                id: node.data.id,
+                x: tempVariable.x,
+                y: tempVariable.y
+            }
+
+            this.nodePos.push(tempNodePos);
+        })
+    }
+
     renderData() {
-        var cy = cytoscape({
+        this.cy = cytoscape({
             container: document.getElementById('cy'),
 
             boxSelectionEnabled: false,
@@ -141,15 +139,10 @@ export class GraphComponent implements OnInit {
 
         });
 
-        cy.zoomingEnabled(false);
-        cy.userPanningEnabled(false);
-        cy.$('').ungrabify();
+        this.cy.zoomingEnabled(false);
+        this.cy.userPanningEnabled(false);
+        this.cy.$('').ungrabify();
 
-        this.temp.nodes.forEach((node) => {
-            this.tempNodePos = cy.$(`#${node.data.id}`).renderedPosition();
-            this.nodePos.push(this.tempNodePos);
-        })
-
-        this.containerService.createContainer(this.nodePos);
+        this.getContainer();
     }
 }
