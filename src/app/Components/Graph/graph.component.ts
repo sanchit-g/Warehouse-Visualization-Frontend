@@ -1,14 +1,17 @@
+import { tempPosition } from './../../Models/nodes/node';
 import { MqttService } from '../../Services/mqtt.service';
 import { GraphService } from '../../Services/graph_services/graph.service';
 import { AfterViewInit, Component, OnInit } from '@angular/core';
 import * as cytoscape from 'cytoscape';
+import * as createjs from 'createjs-module';
+import { NgFor } from '@angular/common';
 
 @Component({
     selector: 'app-graph',
     templateUrl: './graph.component.html',
     styleUrls: ['./graph.component.css'],
 })
-export class GraphComponent implements OnInit,AfterViewInit {
+export class GraphComponent implements OnInit {
     constructor(
         private graphService: GraphService,
         private mqttClientService: MqttService
@@ -19,6 +22,18 @@ export class GraphComponent implements OnInit,AfterViewInit {
     edgesData!: any[];
     dataCombined: any;
     temp: { nodes: any[]; edges: any[] } = { nodes: [], edges: [] };
+    nodePos: any[] = [];
+    tempNodePos!: any;
+    index!: number;
+
+    getWidth(): any {
+        return screen.width;
+    }
+
+    getHeight(): any {
+        return screen.height;
+    }
+
 
     customStyle: any[] = [
         {
@@ -57,29 +72,30 @@ export class GraphComponent implements OnInit,AfterViewInit {
         // }, 1000);
     }
 
-    ngAfterViewInit(): void {
-    
-        // var stage = new createjs.Stage('containerCircle');
-        
-        // var circle = new createjs.Shape();
-        // circle.graphics.beginFill("DeepSkyBlue").drawCircle(0, 0, 2);
-        // circle.x = 35;
-        // circle.y = 29; 
-        // stage.addChild(circle);    
-        // stage.update();
-    
-        // createjs.Tween.get(circle, { loop: true })
-        //   .to({ visible : false, x: 80 }, 2000)
-    
-        // createjs.Ticker.setFPS(60);
-        // createjs.Ticker.addEventListener("tick", stage);
+    createContainer() {
+        var stage = new createjs.Stage('containerCircle');
+        var circle = new createjs.Shape();
+        circle.graphics.beginFill("DeepSkyBlue").drawCircle(0, 0, 10);
+
+        circle.x = this.nodePos.at(0).x;
+        circle.y = this.nodePos.at(0).y;
+
+        stage.addChild(circle);
+        stage.update();
+
+        createjs.Tween.get(circle, { loop: true })
+            .to({ visible: false, x: this.nodePos.at(1).x }, 2000)
+
+        createjs.Ticker.setFPS(60);
+        createjs.Ticker.addEventListener("tick", stage);
+
     }
 
     getNode() {
         this.graphService.getNodes().subscribe((res) => {
             this.temp.nodes = res.nodeDataList;
             console.log(this.temp.nodes);
-            
+
             this.temp.nodes.forEach((node) => {
                 var customStyleObject = {
                     selector: `#${node.data.id}`,
@@ -114,7 +130,7 @@ export class GraphComponent implements OnInit,AfterViewInit {
                     'background-color': `${res.color}`,
                     'text-valign': 'center',
                     'text-halign': 'center',
-                    "font-size" : '0.4px',
+                    "font-size": '0.4px',
                     shape: 'barrel',
                 },
             };
@@ -138,24 +154,18 @@ export class GraphComponent implements OnInit,AfterViewInit {
 
             layout: {
                 name: 'preset',
-                // rows : 2,
             },
+
         });
 
-        let flag: Boolean;
-        flag = true;
+        cy.zoomingEnabled(false);
+        cy.userPanningEnabled(false);
+        cy.$('').ungrabify();
 
-        cy.on('tap', 'node', function (evt) {
-            if (flag) {
-                flag = false;
-                evt.target.addClass('highlight');
-            } else {
-                flag = true;
-                evt.target.removeClass('highlight');
-            }
-        });
-        // cy.zoomingEnabled(false);
-        // cy.userPanningEnabled(true);
-        // cy.$('').ungrabify();
+        this.temp.nodes.forEach((node) => {
+            this.tempNodePos = cy.$(`#${node.data.id}`).renderedPosition();
+            this.nodePos.push(this.tempNodePos);
+        })
+        this.createContainer();
     }
 }

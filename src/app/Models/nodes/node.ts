@@ -15,3 +15,8 @@ export interface Position {
     x: number;
     y: number;
 }
+
+export interface tempPosition {
+    x: number;
+    y: number;
+}
