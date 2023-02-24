@@ -1,3 +1,5 @@
+import { EdgeData } from './../../Models/edges/edge';
+import { NodeData } from './../../Models/nodes/node';
 import { ContainerPosition } from './../../Models/container/containers';
 import { ContainerService } from '../../Services/ContainerService/container.service';
 import { MqttService } from '../../Services/mqtt.service';
@@ -35,7 +37,6 @@ export class GraphComponent implements OnInit {
         return screen.height;
     }
 
-
     customStyle: any[] = [
         {
             selector: 'node',
@@ -56,12 +57,6 @@ export class GraphComponent implements OnInit {
                 'target-arrow-shape': 'triangle',
                 'arrow-scale': '0.03px',
                 'overlay-opacity': 0,
-            },
-        },
-        {
-            selector: '.highlight',
-            css: {
-                'background-color': 'red',
             },
         },
     ];

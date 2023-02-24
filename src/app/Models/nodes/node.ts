@@ -8,6 +8,10 @@ export interface NodeData {
 }
 export interface Node {
     id: string;
+    type: string,
+    color: string,
+    width: number,
+    height: number
 }
 
 export interface Position {
