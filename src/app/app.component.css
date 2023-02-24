@@ -1,3 +1,10 @@
-.example-card {
-    max-width: 200px;
+.container {
+    height: 100vh;
+    position: relative;
+}
+
+#demoCanvas {
+    width: 100%;
+    z-index: 9;
+    /* background-color: aquamarine; */
 }

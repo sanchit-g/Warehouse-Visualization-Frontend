@@ -1,11 +1,18 @@
 body {
     font: 14px helvetica neue, helvetica, arial, sans-serif;
 }
-
 #cy {
     height: 100%;
     width: 100%;
-    position: absolute;
+    position: fixed;
     left: 0;
-    top: 0; 
+    top: 0;
+    /* background-color: aqua; */
+}
+
+#containerCircle{
+    height: 100%;
+    width: 100%;
+    /* background-color: black; */
+    position: absolute;
 }

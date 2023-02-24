@@ -1,19 +1,14 @@
 import { MqttService } from '../../Services/mqtt.service';
-import { NodeData } from '../../Models/nodes/node';
-import { EdgeData } from '../../Models/edges/edge';
-import { Edge } from '../../Models/edges/edge';
 import { GraphService } from '../../Services/graph_services/graph.service';
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import * as cytoscape from 'cytoscape';
-import { Node } from '../../Models/nodes/node';
-import { timeInterval } from 'rxjs';
 
 @Component({
     selector: 'app-graph',
     templateUrl: './graph.component.html',
     styleUrls: ['./graph.component.css'],
 })
-export class GraphComponent implements OnInit {
+export class GraphComponent implements OnInit,AfterViewInit {
     constructor(
         private graphService: GraphService,
         private mqttClientService: MqttService
@@ -32,10 +27,9 @@ export class GraphComponent implements OnInit {
                 'background-color': 'blue',
                 'text-valign': 'center',
                 'text-halign': 'center',
-                height: '1px',
-                width: '1px',
+                'height': '1px',
+                'width': '1px',
                 'font-size': '0.6px',
-                'overlay-opacity': 0,
             },
         },
         {
@@ -63,10 +57,29 @@ export class GraphComponent implements OnInit {
         // }, 1000);
     }
 
+    ngAfterViewInit(): void {
+    
+        // var stage = new createjs.Stage('containerCircle');
+        
+        // var circle = new createjs.Shape();
+        // circle.graphics.beginFill("DeepSkyBlue").drawCircle(0, 0, 2);
+        // circle.x = 35;
+        // circle.y = 29; 
+        // stage.addChild(circle);    
+        // stage.update();
+    
+        // createjs.Tween.get(circle, { loop: true })
+        //   .to({ visible : false, x: 80 }, 2000)
+    
+        // createjs.Ticker.setFPS(60);
+        // createjs.Ticker.addEventListener("tick", stage);
+    }
+
     getNode() {
         this.graphService.getNodes().subscribe((res) => {
             this.temp.nodes = res.nodeDataList;
-
+            console.log(this.temp.nodes);
+            
             this.temp.nodes.forEach((node) => {
                 var customStyleObject = {
                     selector: `#${node.data.id}`,
@@ -95,18 +108,18 @@ export class GraphComponent implements OnInit {
         this.mqttClientService.getMessages(this.queueName).subscribe((res) => {
             console.log(res);
             var customStyleObject = {
-                selector: `#${res.stationId}`,
+                selector: `#${res.fromScanner}, #${res.toScanner}`,
                 style: {
                     content: res.containerId,
                     'background-color': `${res.color}`,
                     'text-valign': 'center',
                     'text-halign': 'center',
+                    "font-size" : '0.4px',
                     shape: 'barrel',
                 },
             };
             this.customStyle.push(customStyleObject);
             this.renderData();
-            // this.customStyle.pop();
         });
     }
 
@@ -125,7 +138,7 @@ export class GraphComponent implements OnInit {
 
             layout: {
                 name: 'preset',
-                padding: 5,
+                // rows : 2,
             },
         });
 
@@ -141,14 +154,8 @@ export class GraphComponent implements OnInit {
                 evt.target.removeClass('highlight');
             }
         });
-        cy.zoomingEnabled(false);
+        // cy.zoomingEnabled(false);
+        // cy.userPanningEnabled(true);
+        // cy.$('').ungrabify();
     }
 }
-
-// nodes: [
-//     { data: { id: 'a'} },
-
-// ],
-// edges: [
-//     { data: { id: 'ab', source: 'a', target: 'b' } },
-// ],
