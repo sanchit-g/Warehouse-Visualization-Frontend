@@ -26,8 +26,10 @@ export class GraphComponent implements OnInit {
     temp: { nodes: any[]; edges: any[] } = { nodes: [], edges: [] };
     nodePos: ContainerPosition[] | any[] = [];
     cy: any;
-    indexFromScanner!: number;
-    indexToScanner!: number;
+
+    containerMap: any = new Map<string, string>();
+    scannerMap: any = new Map<string, number>();
+
 
     getWidth(): any {
         return screen.width;
@@ -97,8 +99,48 @@ export class GraphComponent implements OnInit {
 
     getStatus() {
         this.mqttClientService.getMessages(this.queueName).subscribe((res) => {
-            console.log(res);
+            var lastPosition = null;
+            var scannerCount;
+
+            if (this.containerMap.get(res.containerId) != null) {
+                lastPosition = this.containerMap.get(res.containerId);
+                var count = this.scannerMap.get(lastPosition);
+                this.scannerMap.set(lastPosition, count - 1);
+            }
+
+            if (this.scannerMap.get(res.fromScanner) != null) {
+                scannerCount = this.scannerMap.get(res.fromScanner);
+            }
+            else
+                scannerCount = 0;
+
+            this.scannerMap.set(res.fromScanner, scannerCount + 1);
+            this.containerMap.set(res.containerId, res.fromScanner);
+
+            this.scannerMap.forEach((value: number, key: string) => {
+                if (value > 5) {
+                    var customStyleObject = {
+                        selector: `#${key}`,
+                        style: {
+                            'background-color': 'yellow',
+                        },
+                    };
+                    this.customStyle.push(customStyleObject);
+                }
+                else {
+                    var customStyleObject = {
+                        selector: `#${key}`,
+                        style: {
+                            'background-color': 'red',
+                        },
+                    };
+                    this.customStyle.push(customStyleObject);
+                }
+
+            });
+
             this.containerService.createContainer(this.nodePos, res.fromScanner, res.toScanner);
+            this.renderData();
         });
     }
 
@@ -132,7 +174,6 @@ export class GraphComponent implements OnInit {
             layout: {
                 name: 'preset',
             },
-
         });
 
         this.cy.zoomingEnabled(false);
