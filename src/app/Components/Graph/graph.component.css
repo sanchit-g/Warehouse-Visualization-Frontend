@@ -7,9 +7,9 @@ body {
     position: fixed;
     left: 0;
     top: 0;
-    /* background-color: aqua; */
 }
 
 #containerCircle{
-    position: absolute;
+    position: fixed;
+    background-color: #EDF1F7;
 }

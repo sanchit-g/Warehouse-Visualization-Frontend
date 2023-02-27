@@ -46,9 +46,12 @@ export class GraphComponent implements OnInit {
                 'background-color': 'blue',
                 'text-valign': 'center',
                 'text-halign': 'center',
+                'color': "black",
                 'height': '1px',
                 'width': '1px',
-                'font-size': '0.6px',
+                'font-size': '0.5px',
+                'border-width': "0.01px",
+                'border-color': "black"
             },
         },
         {
@@ -58,7 +61,10 @@ export class GraphComponent implements OnInit {
                 width: '0.1px',
                 'target-arrow-shape': 'triangle',
                 'arrow-scale': '0.03px',
+                'opacity': 0.3,
                 'overlay-opacity': 0,
+                'line-color': "black"
+                // #22548B
             },
         },
     ];
@@ -79,7 +85,8 @@ export class GraphComponent implements OnInit {
                     style: {
                         content: node.data.id,
                         shape: `${node.data.type}`,
-                        'background-color': `${node.data.color}`,
+                        // 'background-color': `${node.data.color}`,
+                        'background-color': "white",
                         height: `${node.data.height}`,
                         width: `${node.data.width}`,
                     },
@@ -119,10 +126,11 @@ export class GraphComponent implements OnInit {
 
             this.scannerMap.forEach((value: number, key: string) => {
                 if (value > 5) {
-                    var customStyleObject = {
+                    let customStyleObject = {
                         selector: `#${key}`,
                         style: {
-                            'background-color': 'yellow',
+                            'background-color': '#EE3124',
+                            'color': "#000000"
                         },
                     };
                     this.customStyle.push(customStyleObject);
@@ -131,7 +139,8 @@ export class GraphComponent implements OnInit {
                     var customStyleObject = {
                         selector: `#${key}`,
                         style: {
-                            'background-color': 'red',
+                            'background-color': 'white',
+                            'color': "#000000"
                         },
                     };
                     this.customStyle.push(customStyleObject);

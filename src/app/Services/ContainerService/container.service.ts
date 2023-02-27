@@ -18,7 +18,7 @@ export class ContainerService {
 
     createContainer(nodePos: ContainerPosition[] | any[], fromScanner: string, toScanner: string) {
         var circle = new createjs.Shape();
-        circle.graphics.beginFill("DeepSkyBlue").drawCircle(0, 0, 10);
+        circle.graphics.beginFill("#065BAA").drawCircle(0, 0, 10);
 
         this.indexFromScanner = nodePos.findIndex((x) => {
             if (x.id == fromScanner) {
