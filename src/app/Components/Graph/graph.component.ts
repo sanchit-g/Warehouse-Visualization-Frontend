@@ -85,8 +85,7 @@ export class GraphComponent implements OnInit {
                     style: {
                         content: node.data.id,
                         shape: `${node.data.type}`,
-                        // 'background-color': `${node.data.color}`,
-                        'background-color': "white",
+                        'background-color': `${node.data.color}`,
                         height: `${node.data.height}`,
                         width: `${node.data.width}`,
                     },
